@@ -6,7 +6,7 @@
 /*   By: wnocchi <wnocchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 10:24:28 by wnocchi           #+#    #+#             */
-/*   Updated: 2024/02/21 14:58:54 by wnocchi          ###   ########.fr       */
+/*   Updated: 2024/02/21 17:01:52 by wnocchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,24 +39,26 @@ char **get_path(char **envp)
 	return (NULL);
 }
 
-char	**join_path(char *av, char **envp)
+char	*join_path_access(char *av, char **envp)
 {
 	int i = 0;
 	char **s;
+	char *res;
 	
+	res = NULL;
 	s = get_path(envp);
+	if(!s)
+		return (NULL);
 	while(s[i])
 	{
-		s[i] = join_free(s[i], "/");
-		s[i] = join_free(s[i], av);
+		res = ft_strcat_malloc(s[i], "/");
+		res = join_free(res, av);
+		if(access(res, X_OK) == 0)
+			return(res);
+		// free(res);
 		i++;
 	}
-	return (s);
-}
-
-int	try_access(char **s)
-{
-	
+	return (NULL);
 }
 
 int main(int ac, char **av, char **envp)
@@ -65,23 +67,27 @@ int main(int ac, char **av, char **envp)
 	(void)ac;
 	(void)av;
 
-	// pid_t pid;
-	
-	char	**res;
+	pid_t pid;
+	// pid_t pid2;
+	char	*res;
+	// char	*res2;
 
-	res = join_path(av[1], envp);
-	for(int i = 0;res[i];i++){
-		ft_printf("%s\n", res[i]);
-		free(res[i]);	
+	pid = fork();
+	// pid2 = fork();
+	
+	// ft_printf("pid1 = %d\n", pid);
+	if(pid == -1)
+	{
+		perror("fork");
+		exit(1);
 	}
-	if(res)
-		free(res);
-	// pid = fork();
-	// if(pid == -1)
-	// {
-	// 	perror("fork");
-	// 	exit(1);
-	// }
+
+	res = join_path_access(av[1], envp);
+	// ft_printf("res: %s\n", res);
+	// res2 = join_path_access(av[2], envp);
+	// ft_printf("res2: %s\n", res2);
+	// execve(res, &av[1], envp);
+	// free(res);
 	// pipe->file1 = av[1];
 	// pipe->cmd1 = av[2];
 	// pipe->cmd2 = av[3];
@@ -90,15 +96,15 @@ int main(int ac, char **av, char **envp)
 	// if (ac == 5){
 	// 	if(access(pipe->file1, F_OK | W_OK | R_OK | X_OK) == 0)
 	// 		open(pipe->file1, O_RDONLY);
-	// if(pid == 0){
-		
-	// 	execve("/usr/bin/ls", av, envp);
+	if(pid == 0){
+		execve(res, &av[1], envp);
+	}
+	// waitpid(pid, NULL, 0);
+	// if(pid2 == 0){
+	// 	execve(res2, &av[2], envp);
 	// }
-	// else {
-	// 	waitpid(pid, NULL, 0);
-	// }
+	// waitpid(pid2, NULL, 0);
 	// ft_printf("%s\n", "salut");
-	// }
 	// for (int i = 0; envp[0]; i++)
 	return(0);
 }
