@@ -6,7 +6,7 @@
 /*   By: wnocchi <wnocchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/20 10:24:28 by wnocchi           #+#    #+#             */
-/*   Updated: 2024/02/22 16:20:17 by wnocchi          ###   ########.fr       */
+/*   Updated: 2024/02/22 16:59:19 by wnocchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,28 +120,35 @@ int main(int ac, char **av, char **envp)
 	if(pid == -1)
 		perror("");
 	if(pid == 0){
-		dup2(in, STDIN_FILENO);
-		dup2(pipein[1], 1);
 		close(pipein[0]);
+		dup2(in, STDIN_FILENO);
+		close(in);
+		close(out);
+		dup2(pipein[1], 1);
+		close(pipein[1]);
 		 if (execve(res, cmd1, envp) == -1)
 		 	perror("");
-		exit(0);
 		free(res);
 	}
+	else
+		waitpid(pid, NULL, 0);
 	pid2 = fork();
-	if(pid2 == -1)
-		perror("");
+	// if(pid2 == -1)
+	// 	perror("");
+	close(in);
+	close(out);
 	if(pid2 == 0)
 	{
+		close(pipein[1]);
 		dup2(pipein[1], 0);
 		dup2(out, STDOUT_FILENO);
-		close(pipein[0]);
+		close(out);
+		close(in);
 		execve(res2, cmd2, envp);
-		exit(0);
 		free(res2);
 	}
-	waitpid(pid, NULL, 0);
-	waitpid(pid2, NULL, 0);
+	else
+		waitpid(pid2, NULL, 0);
 	// ft_printf("%p\n", res);
 	// if(pid2 == 0){
 	// 	execve(res2, &av[2], envp);
