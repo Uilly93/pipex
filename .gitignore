@@ -4,3 +4,7 @@
 */*.a
 *.o
 *.a
+*.txt
+pipex
+infile
+out
