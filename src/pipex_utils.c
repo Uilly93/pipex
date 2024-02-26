@@ -6,7 +6,7 @@
 /*   By: wnocchi <wnocchi@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/26 10:48:39 by wnocchi           #+#    #+#             */
-/*   Updated: 2024/02/26 11:12:05 by wnocchi          ###   ########.fr       */
+/*   Updated: 2024/02/26 13:31:06 by wnocchi          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,16 +79,20 @@ void	free_close(t_pipex *pipex)
 		free(pipex->path1);
 	if (pipex->path2)
 		free(pipex->path2);
-	close(pipex->in);
-	close(pipex->out);
+	if (pipex->in != -1)
+		close(pipex->in);
+	if (pipex->out != -1)
+		close(pipex->out);
 	close(pipex->pipein[0]);
 	close(pipex->pipein[1]);
 }
 
 void	close_fds(t_pipex pipex)
 {
-	close(pipex.in);
-	close(pipex.out);
+	if (pipex.in != -1)
+		close(pipex.in);
+	if (pipex.out != -1)
+		close(pipex.out);
 	close(pipex.pipein[0]);
 	close(pipex.pipein[1]);
 }
